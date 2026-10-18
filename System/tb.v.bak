@@ -1,0 +1,35 @@
+`timescale 1ns/1ns
+module TB();
+    reg clk,rst;
+    reg spi_miso;
+    wire spi_clk;
+    wire spi_mosi;
+
+    System sys_inst(
+        .clk(clk),
+        .rst(rst),
+        .spi_clk(spi_clk),
+        .spi_mosi(spi_mosi),
+        .spi_miso(spi_miso)
+    );
+    spi_display_emulator disp_inst(
+        .sck(spi_clk),
+        .mosi(spi_mosi)
+    );
+
+    always #5 clk = ~clk;
+
+    initial begin
+        clk = 0;
+        rst = 0;
+        spi_miso = 0;
+
+        @(posedge clk) rst = 1;
+        @(posedge clk) rst = 0;
+
+        #4000000;
+        disp_inst.dump_screen();
+        $stop;
+    end
+
+endmodule
